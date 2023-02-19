@@ -1,9 +1,9 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types, executor
+from config import TOKEN_API
 
 
-TOKEN_API = '5889825944:AAG5pxKqEqBVsDEOXvYV7Sy0ZmBptTyazTU'
 # логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 # объект бота
@@ -20,6 +20,10 @@ dp = Dispatcher(bot)
 # # запуск процесса поллинга новых апдейтов
 # async def main():
 #     await dp.start_polling(bot)
+@dp.message_handler()
+async def echo(message: types.Message):
+    await message.answer(text=message.text.upper())
+
 
 if __name__ == '__main__':
     # asyncio.run(main())
