@@ -13,12 +13,17 @@ HELP_COMMAND = """
 <b>/description</b> - <em>описание бота</em>
 <b>/count</b> - <em>количество отправленных сообщений</em>
 <b>/give</b> - <em>отправить стикер</em>
+<b>/picture</b> - <em>отправить картинку</em>
+<b>/location</b> - <em>отправить местоположение</em>
 """
 
 BOT_DESCRIPTION = """
 Этот милый бот плод моего творения,
 наслаждайтесь его работой:)
 
+Возможности:
+- при отправке стикера вернет его айди
+- дублирует сообщение. если в сообщении красное сердечко, то меняет его на черное
 p.s.
 полное описание возможностей в доработке
 """
@@ -102,10 +107,11 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['give'])
 async def give_command(message: types.Message):
     """Бот отправляет стикер."""
-    await message.answer('смотри какой смешной котик')
+    await message.answer('смотри какой смешной котик\nшутка')
     await bot.send_sticker(message.from_user.id,
                            sticker="CAACAgIAAxkBAAEH0p9j8z9SA9n8DxwWkHiDxCZcn87M4QACZwEAApafjA6u9uvd6FBSAS4E")
     await message.delete()
+
 
 @dp.message_handler(commands=['picture'])
 async def picture_command(message: types.Message):
@@ -113,6 +119,16 @@ async def picture_command(message: types.Message):
     await bot.send_photo(chat_id=message.chat.id,
                          photo=photo)
     await message.delete()
+
+
+@dp.message_handler(commands=['location'])
+async def location_command(message: types.Message):
+    """Отправляет местоположение."""
+    await bot.send_location(chat_id=message.chat.id,
+                            latitude=50,
+                            longitude=75)
+    await message.delete()
+
 
 @dp.message_handler(content_types=['sticker'])
 async def get_sticker_id(message: types.Message):
