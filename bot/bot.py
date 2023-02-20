@@ -3,6 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import InputFile
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from config import TOKEN_API
 from contextlib import contextmanager
@@ -16,6 +17,8 @@ HELP_COMMAND = """
 <b>/give</b> - <em>отправить стикер</em>
 <b>/picture</b> - <em>отправить картинку</em>
 <b>/location</b> - <em>отправить местоположение</em>
+<b>/кайф</b> - <em>тупо кайф</em>
+<b>/botfather</b> - <em>кто тут папочка</em>
 """
 
 BOT_DESCRIPTION = """
@@ -45,6 +48,15 @@ dp = Dispatcher(bot)
 # Клавиатура
 kb = ReplyKeyboardMarkup(resize_keyboard=True,
                          one_time_keyboard=True)  # убирает клавиатуру, после выбранного действия
+# Инлайн клавиатура
+ikb = InlineKeyboardMarkup(row_width=2)
+
+ib1 = InlineKeyboardButton(text='кайф',
+                           url='https://www.youtube.com/results?search_query=%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5+%D0%BF%D0%B5%D0%BB%D1%8C%D0%BC%D0%B5%D0%BD%D0%B8')
+ib2 = InlineKeyboardButton(text='КАЙФ',
+                           url='https://www.youtube.com/watch?v=fueQTjD0980&ab_channel=%D0%9E%D0%BB%D1%8F%D0%91%D0%B5%D0%BB%D0%BE%D1%81%D0%BB%D1%83%D0%B4%D1%86%D0%B5%D0%B2%D0%B0')
+ikb.add(ib1, ib2)
+
 b1 = KeyboardButton('/help')
 b2 = KeyboardButton('/description')
 b3 = KeyboardButton('/count')
@@ -53,7 +65,8 @@ b5 = KeyboardButton('/picture')
 b6 = KeyboardButton('/location')
 b7 = KeyboardButton('/❤️')
 b8 = KeyboardButton('/кайф')
-kb.add(b1).insert(b2).add(b3).insert(b4).add(b5).insert(b6).add(b7).insert(b8)
+b9 = KeyboardButton('/botfather')
+kb.add(b1).insert(b2).add(b3).insert(b4).add(b5).insert(b6).add(b7).insert(b8).add(b9)
 
 
 class FileCounter:
@@ -95,6 +108,16 @@ async def on_startup(_):
     print(f'А вот и счетчик: {_count_calls}')
 
 
+@dp.message_handler(commands=['sleep'])
+async def sleep_command(message: types.Message):
+    photo = InputFile('sleep.jpeg')
+    photo1 = InputFile('ozornica.png')
+    await message.answer('хватит баловаться')
+    await bot.send_photo(chat_id=message.chat.id,
+                         photo=photo1)
+    await message.delete()
+
+
 @dp.message_handler(commands=['count'])
 async def count_command(message: types.Message):
     await message.answer(f'Всего отправлено сообщений: {_count_calls}')
@@ -116,9 +139,10 @@ async def help_command(message: types.Message):
 
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    await message.answer(text='<em><b>Добро</b> пожаловать!</em>',
-                         parse_mode='HTML',
-                         reply_markup=kb)
+    await bot.send_message(text='<em><b>Добро</b> пожаловать!</em>',
+                           parse_mode='HTML',
+                           reply_markup=kb,
+                           chat_id=message.chat.id)
     await message.delete()
 
 
@@ -147,9 +171,10 @@ async def kayf_command(message: types.Message):
     picture = random.choice(tup_of_kayf)
     photo = InputFile(picture)
     indx = [char for char in picture if char.isdigit()]
-    await message.reply(text=messages[int(indx[0])-1])
+    await message.reply(text=messages[int(indx[0]) - 1])
     await bot.send_photo(chat_id=message.chat.id,
-                         photo=photo)
+                         photo=photo,
+                         reply_markup=ikb)
     await message.delete()
 
 
@@ -162,7 +187,7 @@ async def picture_command(message: types.Message):
 
 
 @dp.message_handler(commands=['botfather'])
-async def picture_command(message: types.Message):
+async def botfather_command(message: types.Message):
     photo = InputFile('botfather.png')
     await message.answer('Кто тут папочка')
     await bot.send_photo(chat_id=message.chat.id,
