@@ -1,6 +1,8 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types, executor
+from aiogram.types import InputFile
+
 from config import TOKEN_API
 from contextlib import contextmanager
 
@@ -86,7 +88,9 @@ async def description_command(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def help_command(message: types.Message):
-    await message.reply(text=HELP_COMMAND, parse_mode='HTML')
+    await bot.send_message(chat_id=message.from_user.id,
+                           text=HELP_COMMAND,
+                           parse_mode='HTML')
 
 
 @dp.message_handler(commands=['start'])
@@ -103,11 +107,18 @@ async def give_command(message: types.Message):
                            sticker="CAACAgIAAxkBAAEH0p9j8z9SA9n8DxwWkHiDxCZcn87M4QACZwEAApafjA6u9uvd6FBSAS4E")
     await message.delete()
 
+@dp.message_handler(commands=['picture'])
+async def picture_command(message: types.Message):
+    photo = InputFile('dog.jpeg')
+    await bot.send_photo(chat_id=message.chat.id,
+                         photo=photo)
+    await message.delete()
 
 @dp.message_handler(content_types=['sticker'])
 async def get_sticker_id(message: types.Message):
     """Возвращает айди стикера."""
-    await message.answer(message.sticker.file_id)
+    await bot.send_message(chat_id=message.from_user.id,
+                           text=message.sticker.file_id)
 
 
 @dp.message_handler()
@@ -117,9 +128,16 @@ async def echo(message: types.Message):
         bot_message = message.text.replace('❤️', '🖤')
     global _count_calls
     _count_calls += 1
-    # bot_message = random.choice(string.ascii_lowercase)
-
     await message.answer(text=bot_message)
+
+
+@dp.message_handler()
+async def echo(message: types.Message):
+    """Отправляет сообщение в чат указанный в chat_id"""
+    global _count_calls
+    _count_calls += 1
+    # chat_id=message.from_user.id будет отправлять только в личку пользователю
+    await bot.send_message(chat_id=message.chat.id, text=message.text)
 
 
 if __name__ == '__main__':
