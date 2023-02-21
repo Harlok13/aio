@@ -127,12 +127,7 @@ async def open_kb_photo(message: types.Message):
 @dp.message_handler(Text(equals='Рандом фото'))
 async def send_random_photo(message: types.Message):
     """Отправляет рандомное фото с описанием"""
-    flag = random.choice(tuple(PHOTO_DATA.keys()))
-    photo = InputFile(flag)
-    await bot.send_photo(chat_id=message.chat.id,
-                         photo=photo,
-                         caption=PHOTO_DATA.get(flag, False))
-    await message.delete()
+    await send_random(message)
 
 
 @dp.message_handler(Text(equals='Главное меню'))
