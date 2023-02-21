@@ -46,7 +46,6 @@ PHRASE2 = ('заморская', 'приплюснутая', 'обычная', '
            'нафуфыренная', 'унитазолюбивая', 'раздупленная', 'недоделанная', 'недоделанная',
            'расколбассная', 'придурковатая', 'миленькая', 'бензоколоночная')
 
-
 PHOTO = ('kayf1.jpeg', 'kayf2.jpeg',
          'kayf3.jpeg', 'kayf4.jpeg',
          'morning.jpeg', 'morningcat.jpeg',
@@ -254,6 +253,18 @@ async def random_phrases_commands(message: types.Message):
     result = f'{random.choice(PHRASE1)} {random.choice(PHRASE2)}'
     await message.answer(text=result)
     await message.delete()
+
+
+@dp.callback_query_handler()
+async def callback_random_photo(callback: types.CallbackQuery):
+    """Обрабатывает колбеки при нажатии на инлайн клавиатуре send_random_photo"""
+    if callback.data == 'like':
+        await callback.message.answer('Вам понравилось!')
+    elif callback.data == 'dislike':
+        await callback.message.answer('Вам не понравилось!')
+    else:
+        await send_random(message=callback.message)
+        await callback.answer()
 
 
 @dp.message_handler()
