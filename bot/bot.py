@@ -1,8 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, types, executor
+from aiogram.dispatcher.filters import Text
 from aiogram.types import InputFile
-
-
 
 from config import TOKEN_API
 from contextlib import contextmanager
@@ -93,6 +92,19 @@ async def on_startup(_):
 
     print(f'А вот и счетчик: {_count_calls}')
 
+
+@dp.message_handler(Text(equals='Random photo'))
+async def open_kb_photo(message: types.Message):
+    await message.answer('Нажмите Рандом фото',
+                         reply_markup=kb_photo)
+    await message.delete()
+
+
+@dp.message_handler(Text(equals='Главное меню'))
+async def open_main_menu(message: types.Message):
+    await message.answer('Добро пожаловать в главное меню',
+                         reply_markup=kb_photo)
+    await message.delete()
 
 @dp.message_handler(commands=['sleep'])
 async def sleep_command(message: types.Message):
