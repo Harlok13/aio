@@ -1,16 +1,17 @@
-import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import InputFile
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+
 
 from config import TOKEN_API
 from contextlib import contextmanager
 
+from keyboard import *
+
 HELP_COMMAND = """
 Все возможности бота описаны в decription
-<b>/start</b> - <em>начать работу с ботом</em>
+<b>/start</b> - <em>начать работу с ботом/октрыть клавиатуру</em>
 <b>/help</b> - <em>список команд</em>
 <b>/description</b> - <em>описание бота</em>
 <b>/count</b> - <em>количество отправленных сообщений</em>
@@ -19,6 +20,7 @@ HELP_COMMAND = """
 <b>/location</b> - <em>отправить местоположение</em>
 <b>/кайф</b> - <em>тупо кайф</em>
 <b>/botfather</b> - <em>кто тут папочка</em>
+<b>/phrase</b> - <em>а ты попробуй</em>
 """
 
 BOT_DESCRIPTION = """
@@ -39,34 +41,18 @@ _COUNTER_FILE = 'counter'
 
 tup_of_kayf = ['kayf1.jpeg', 'kayf2.jpeg', 'kayf3.jpeg', 'kayf4.jpeg']
 
+PHRASE1 = ('королева', 'стерва', 'фуфыря', 'малюся', 'накрасюся', 'микросюся',
+           'милафка', 'инфузория', 'кровосися', 'микродырочка', 'сюсипуси', 'обжора', 'выдра')
+PHRASE2 = ('заморская', 'приплюснутая', 'обычная', 'обыкновенная', 'чудоковатая',
+           'нафуфыренная', 'унитазолюбивая', 'раздупленная', 'недоделанная', 'недоделанная',
+           'расколбассная', 'придурковатая', 'миленькая', 'бензоколоночная')
+
 # логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 # объект бота
 bot = Bot(token=TOKEN_API)
 # Диспетчер
 dp = Dispatcher(bot)
-# Клавиатура
-kb = ReplyKeyboardMarkup(resize_keyboard=True,
-                         one_time_keyboard=True)  # убирает клавиатуру, после выбранного действия
-# Инлайн клавиатура
-ikb = InlineKeyboardMarkup(row_width=2)
-
-ib1 = InlineKeyboardButton(text='кайф',
-                           url='https://www.youtube.com/results?search_query=%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5+%D0%BF%D0%B5%D0%BB%D1%8C%D0%BC%D0%B5%D0%BD%D0%B8')
-ib2 = InlineKeyboardButton(text='КАЙФ',
-                           url='https://www.youtube.com/watch?v=fueQTjD0980&ab_channel=%D0%9E%D0%BB%D1%8F%D0%91%D0%B5%D0%BB%D0%BE%D1%81%D0%BB%D1%83%D0%B4%D1%86%D0%B5%D0%B2%D0%B0')
-ikb.add(ib1, ib2)
-
-b1 = KeyboardButton('/help')
-b2 = KeyboardButton('/description')
-b3 = KeyboardButton('/count')
-b4 = KeyboardButton('/give')
-b5 = KeyboardButton('/picture')
-b6 = KeyboardButton('/location')
-b7 = KeyboardButton('/❤️')
-b8 = KeyboardButton('/кайф')
-b9 = KeyboardButton('/botfather')
-kb.add(b1).insert(b2).add(b3).insert(b4).add(b5).insert(b6).add(b7).insert(b8).add(b9)
 
 
 class FileCounter:
@@ -115,6 +101,16 @@ async def sleep_command(message: types.Message):
     await message.answer('хватит баловаться')
     await bot.send_photo(chat_id=message.chat.id,
                          photo=photo1)
+    await message.delete()
+
+
+@dp.message_handler(commands=['morning'])
+async def sleep_command(message: types.Message):
+    photo = InputFile('morningcat.jpeg')
+    photo1 = InputFile('morning.jpeg')
+    await message.answer('я усталь')
+    await bot.send_photo(chat_id=message.chat.id,
+                         photo=photo)
     await message.delete()
 
 
@@ -210,6 +206,14 @@ async def get_sticker_id(message: types.Message):
     """Возвращает айди стикера."""
     await bot.send_message(chat_id=message.from_user.id,
                            text=message.sticker.file_id)
+
+
+@dp.message_handler(commands=['phrase'])
+async def random_phrases_commands(message: types.Message):
+    import random
+    result = f'{random.choice(PHRASE1)} {random.choice(PHRASE2)}'
+    await message.answer(text=result)
+    await message.delete()
 
 
 @dp.message_handler()
