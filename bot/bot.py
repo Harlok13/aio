@@ -5,7 +5,7 @@ from aiogram.types import InputFile
 
 from config import TOKEN_API
 from contextlib import contextmanager
-
+import random
 from keyboard import *
 
 HELP_COMMAND = """
@@ -45,6 +45,19 @@ PHRASE1 = ('королева', 'стерва', 'фуфыря', 'малюся', '
 PHRASE2 = ('заморская', 'приплюснутая', 'обычная', 'обыкновенная', 'чудоковатая',
            'нафуфыренная', 'унитазолюбивая', 'раздупленная', 'недоделанная', 'недоделанная',
            'расколбассная', 'придурковатая', 'миленькая', 'бензоколоночная')
+
+
+PHOTO = ('kayf1.jpeg', 'kayf2.jpeg',
+         'kayf3.jpeg', 'kayf4.jpeg',
+         'morning.jpeg', 'morningcat.jpeg',
+         'ozornica.png', 'botfather.png')
+
+DESCRIPTION_PHOTO = ('about kayf1', 'about kayf2',
+                     'about kayf3', 'about kayf4',
+                     'about morning', 'about morningcat',
+                     'about ozornica', 'about botfather')
+
+PHOTO_DATA = dict(zip(PHOTO, DESCRIPTION_PHOTO))
 
 # логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
@@ -100,11 +113,22 @@ async def open_kb_photo(message: types.Message):
     await message.delete()
 
 
+@dp.message_handler(Text(equals='Рандом фото'))
+async def send_random_photo(message: types.Message):
+    flag = random.choice(tuple(PHOTO_DATA.keys()))
+    photo = InputFile(flag)
+    await bot.send_photo(chat_id=message.chat.id,
+                         photo=photo,
+                         caption=PHOTO_DATA.get(flag, False))
+    await message.delete()
+
+
 @dp.message_handler(Text(equals='Главное меню'))
 async def open_main_menu(message: types.Message):
     await message.answer('Добро пожаловать в главное меню',
-                         reply_markup=kb_photo)
+                         reply_markup=kb)
     await message.delete()
+
 
 @dp.message_handler(commands=['sleep'])
 async def sleep_command(message: types.Message):
@@ -174,7 +198,6 @@ async def give_command(message: types.Message):
 
 @dp.message_handler(commands=['кайф'])
 async def kayf_command(message: types.Message):
-    import random
     messages = ('кайф', 'кайф кайф', 'кайф?', 'КАААЙЙЙФФФ')
     picture = random.choice(tup_of_kayf)
     photo = InputFile(picture)
@@ -206,7 +229,6 @@ async def botfather_command(message: types.Message):
 @dp.message_handler(commands=['location'])
 async def location_command(message: types.Message):
     """Отправляет местоположение."""
-    import random
     await bot.send_location(chat_id=message.chat.id,
                             latitude=random.random() * 100,
                             longitude=random.random() * 100)
@@ -222,7 +244,6 @@ async def get_sticker_id(message: types.Message):
 
 @dp.message_handler(commands=['phrase'])
 async def random_phrases_commands(message: types.Message):
-    import random
     result = f'{random.choice(PHRASE1)} {random.choice(PHRASE2)}'
     await message.answer(text=result)
     await message.delete()
