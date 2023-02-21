@@ -84,6 +84,16 @@ class FileCounter:
         self.opened_obj.close()
 
 
+async def send_random(message: types.Message):
+    flag = random.choice(tuple(PHOTO_DATA.keys()))
+    photo = InputFile(flag)
+    await bot.send_photo(chat_id=message.chat.id,
+                         photo=photo,
+                         caption=PHOTO_DATA.get(flag, False),
+                         reply_markup=ikb_photo)
+    await message.delete()
+
+
 @contextmanager
 def open_counter_file(file_name, method='r+'):
     """Позволяет записывать состояние счетчика,
