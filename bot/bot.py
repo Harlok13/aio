@@ -108,6 +108,7 @@ async def on_startup(_):
 
 @dp.message_handler(Text(equals='Random photo'))
 async def open_kb_photo(message: types.Message):
+    """Открывает меню управления."""
     await message.answer('Нажмите Рандом фото',
                          reply_markup=kb_photo)
     await message.delete()
@@ -115,6 +116,7 @@ async def open_kb_photo(message: types.Message):
 
 @dp.message_handler(Text(equals='Рандом фото'))
 async def send_random_photo(message: types.Message):
+    """Отправляет рандомное фото с описанием"""
     flag = random.choice(tuple(PHOTO_DATA.keys()))
     photo = InputFile(flag)
     await bot.send_photo(chat_id=message.chat.id,
