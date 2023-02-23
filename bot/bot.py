@@ -1,9 +1,8 @@
 import logging
-from aiogram import Bot, Dispatcher, types, executor
+from aiogram import types, executor
 from aiogram.dispatcher.filters import Text
 from aiogram.types import InputFile
 
-from config import TOKEN_API
 from contextlib import contextmanager
 import random
 from keyboard import *
@@ -60,10 +59,7 @@ PHOTO_DATA = dict(zip(PHOTO, DESCRIPTION_PHOTO))
 
 # логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
-# объект бота
-bot = Bot(token=TOKEN_API)
-# Диспетчер
-dp = Dispatcher(bot)
+
 
 
 class FileCounter:
@@ -90,7 +86,7 @@ async def send_random(message: types.Message):
                          photo=photo,
                          caption=PHOTO_DATA.get(flag, False),
                          reply_markup=ikb_photo)
-    await message.delete()
+    # await message.delete()
 
 
 @contextmanager
@@ -253,6 +249,11 @@ async def random_phrases_commands(message: types.Message):
     result = f'{random.choice(PHRASE1)} {random.choice(PHRASE2)}'
     await message.answer(text=result)
     await message.delete()
+
+
+@dp.message_handler(content_types=types.ContentTypes.PHOTO)
+async def photo_reply(message: types.Message):
+    await message.reply('Красивенько 😍')
 
 
 @dp.callback_query_handler()
