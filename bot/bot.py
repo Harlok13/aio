@@ -61,7 +61,6 @@ PHOTO_DATA = dict(zip(PHOTO, DESCRIPTION_PHOTO))
 logging.basicConfig(level=logging.INFO)
 
 
-
 class FileCounter:
     """
     Позволяет записывать состояние счетчика,
@@ -292,7 +291,9 @@ async def echo(message: types.Message):
     await bot.send_message(chat_id=message.chat.id, text=message.text)
 
 
-if __name__ == '__main__':
-    # asyncio.run(main())
-    # skip_updates будет скипать обновления, если бот не в сети
-    executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
+def main():
+    logging.basicConfig(level=logging.INFO)
+    executor.start_polling(dp,
+                           on_startup=on_startup,
+                           skip_updates=True
+                           )
