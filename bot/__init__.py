@@ -1,2 +1,3 @@
-from bot.bot import start_command
-from bot import keyboard
+# __all__ = ['main']
+#
+# from bot
