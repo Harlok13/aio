@@ -10,20 +10,12 @@ ERROR_FIND_BOOK = 'Ой, такой книги тут нет:('
 async def callback_book_info(callback: types.CallbackQuery):
     logger = logging.getLogger(__name__)
     logger.info(callback)
-    if callback.data == 'Бьюли':
-        try:
-            await bot.send_message(callback.message.chat.id,
-                                   text='вот книга Бьюли',
-                                   reply_to_message_id=BOOKS.get(callback.data, ERROR_FIND_BOOK))
-            await callback.answer('')
-        except BadRequest:
-            await callback.message.answer(ERROR_FIND_BOOK)
-
-    elif callback.data == 'Фаулер':
+    try:
         await bot.send_message(callback.message.chat.id,
-                               text='вот книга Фаулера',
+                               text=f'Вот книга {callback.data}(a)',
                                reply_to_message_id=BOOKS.get(callback.data, ERROR_FIND_BOOK))
-        await callback.answer('')
+    except BadRequest:
+        await callback.message.answer(ERROR_FIND_BOOK)
 
 
 def register_callback_cmd(dp: Dispatcher):
