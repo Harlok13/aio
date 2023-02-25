@@ -6,7 +6,7 @@ from julia.dispatcher import *
 from aiogram import types
 
 
-async def start_cmd(message: types.Message):
+async def echo(message: types.Message):
     print(message)
     if {word.lower().translate(str.maketrans('', '', string.punctuation)) for word in message.text.split()} \
         .intersection(set(json.load(open('cenz.json')))) != set():
@@ -18,4 +18,4 @@ async def start_cmd(message: types.Message):
 
 
 def register_message_handler(dp: Dispatcher):
-    dp.register_message_handler(start_cmd)
+    dp.register_message_handler(echo)
