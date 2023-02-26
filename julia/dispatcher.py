@@ -2,6 +2,8 @@ import logging
 import os
 
 from aiogram import Bot, Dispatcher, executor
+from aiogram.contrib.fsm_storage.redis import RedisStorage, RedisStorage2
+from aioredis import Redis
 from dotenv import load_dotenv, find_dotenv
 
 from handlers import message_handler, cmd_handler, cmd_callback
@@ -10,8 +12,11 @@ load_dotenv(find_dotenv())
 
 logging.basicConfig(level='INFO')
 
+storage = RedisStorage2()
+redis = Redis()
+
 bot = Bot(token=os.getenv('TOKEN_API'))
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=storage)
 
 cmd_callback.register_callback_cmd(dp)
 cmd_handler.register_cmd_handler(dp)
