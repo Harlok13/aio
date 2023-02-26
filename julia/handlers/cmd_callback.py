@@ -17,20 +17,14 @@ MY_ID = 5485747686
 async def callback_book_info(callback: types.CallbackQuery):
     logger = logging.getLogger(__name__)
     logger.info(callback.data)
-    call = await redis.hget(callback.message.chat.id, callback.data)
-
+    call = await redis.get(callback.data)
     try:
-        await bot.send_message(callback.message.chat.id,
-                               text=f'Вот Ваша книга',
-                               reply_to_message_id=int(call))
+        await bot.edit_message_text(text=f"Вот ссылка на вашу книгу:\n{str(call).lstrip('b')}".replace("'", ""),
+                                    chat_id=callback.message.chat.id,
+                                    message_id=callback.message.message_id)
     except Exception as exc:
         logger.info(exc)
-        await bot.send_message(callback.message.chat.id,
-                               ERROR_FIND_BOOK + '\nСейчас я поищу ее у себя')
-        await bot.send_document(callback.message.chat.id,
-                                InputFile(BOOKS.get(callback.data).get('remote_book')))
-        await redis.hset(callback.message.chat.id, callback.data, callback.message.message_id)
-        await callback.message.answer('Вот, нашел для тебя!')
+        print(f'error {exc}')
 
 
 def register_callback_cmd(dp: Dispatcher):
