@@ -3,8 +3,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 MENU_BOARD = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
-        [KeyboardButton('/info')],
-        # [KeyboardButton('location', request_location=True)],
-        # [KeyboardButton('contacts', request_contact=True)]
+        [KeyboardButton(text='/info')],
+        [KeyboardButton(text='/cat')],
+        [KeyboardButton(text='/gif')]
     ]
 )
