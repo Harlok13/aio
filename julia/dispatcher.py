@@ -1,10 +1,13 @@
 import logging
 import os
 
-from aiogram import Bot, Dispatcher, executor
-from aiogram.contrib.fsm_storage.redis import RedisStorage, RedisStorage2
-from aioredis import Redis
+from aiogram.fsm.storage.redis import RedisStorage
 from dotenv import load_dotenv, find_dotenv
+from aioredis import Redis
+
+from aiogram import Bot, Dispatcher
+
+from aiogram.client.session.aiohttp import AiohttpSession
 
 from handlers import message_handler, cmd_handler, cmd_callback
 
@@ -12,16 +15,18 @@ load_dotenv(find_dotenv())
 
 logging.basicConfig(level='INFO')
 
-storage = RedisStorage2()
 redis = Redis()
+storage = RedisStorage(redis=redis)
 
-bot = Bot(token=os.getenv('TOKEN_API'))
-dp = Dispatcher(bot, storage=storage)
+session = AiohttpSession()
+
+bot = Bot(token=os.getenv('TOKEN_API'), session=session)
+dp = Dispatcher(storage=storage)
 
 cmd_callback.register_callback_cmd(dp)
 cmd_handler.register_cmd_handler(dp)
 message_handler.register_message_handler(dp)
 
 
-def main():
-    executor.start_polling(dp, skip_updates=True)
+async def main():
+    await dp.start_polling(bot, skip_updates=True)
