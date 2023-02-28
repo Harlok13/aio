@@ -12,6 +12,18 @@ async def start_cmd(message: types.Message):
                            reply_markup=MENU_BOARD)
 
 
+async def get_cat_cmd(message: types.Message):
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://aws.random.cat/meow') as resp:
+            res = await resp.json()
+    await message.answer_photo(photo=res['file'],
+                               reply_markup=GET_CAT)
+    # await bot.send_photo(message.chat.id,
+    #                      photo=res['file'],
+    #                      reply_markup=GET_CAT)
+    await message.delete()
+
+
 async def info_cmd(message: types.Message):
     mes = 'Выберите книгу:'
     await bot.send_message(message.chat.id,
