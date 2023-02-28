@@ -46,6 +46,7 @@ async def echo(message: types.Message):
                                                'я все вижу']))
     # await bot.send_message(message.chat.id, message.text)
 
+def register_message_handler(dp):
 
 def register_message_handler(dp: Dispatcher):
     dp.register_message_handler(echo)
