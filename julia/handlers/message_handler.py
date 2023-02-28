@@ -8,6 +8,8 @@ from aiogram import types
 
 
 async def photo_reply(message: types.Message):
+    logger = logging.getLogger(__name__)
+    logger.info(message)
     mes = random.choice(['Как чудесно!',
                          'Ну что за милота',
                          'Красивенько 😍'])
