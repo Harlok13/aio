@@ -51,20 +51,20 @@ async def get_gif_cmd(message: types.Message):
 
 
 async def info_cmd(message: types.Message):
-    mes = 'Выберите книгу:'
-    await bot.send_message(message.chat.id,
-                           text=mes,
-                           reply_markup=BOOK_CHOICE_MENU)
+    await message.answer(text='Выберите книгу:',
+                         reply_markup=BOOK_CHOICE_MENU)
 
 
-async def get_book_cmd(message: types.Message):
-    file = InputFile('handlers/road_to.pdf')
-    await bot.send_document(message.from_user.id,
-                            document=file)
-    await message.delete()
+# async def get_book_cmd(message: types.Message):
+#     file = InputFile('handlers/road_to.pdf')
+#     await bot.send_document(message.from_user.id,
+#                             document=file)
+#     await message.delete()
 
 
 def register_cmd_handler(dp: Dispatcher):
-    dp.register_message_handler(start_cmd, commands=['start', 'help'])
-    dp.register_message_handler(get_book_cmd, commands=['book'])
-    dp.register_message_handler(info_cmd, commands=['info'])
+    dp.message.register(start_cmd, Command(commands=['start', 'help']))
+    # dp.message.register(get_book_cmd, Command(commands=['book']))
+    dp.message.register(info_cmd, Command(commands=['info']))
+    dp.message.register(get_cat_cmd, Command(commands=['cat']))
+    dp.message.register(get_gif_cmd, Command(commands=['gif']))
