@@ -7,6 +7,16 @@ from julia.dispatcher import *
 from aiogram import types
 
 
+async def animation_info(message: types.Animation):
+    logger = logging.getLogger(__name__)
+    logger.info(message)
+    print(message)
+    mes = random.choice(['Как чудесно!',
+                         'Ну что за милота',
+                         'Красивенько 😍'])
+    # await message.reply(mes)
+
+
 async def photo_reply(message: types.Message):
     logger = logging.getLogger(__name__)
     logger.info(message)
