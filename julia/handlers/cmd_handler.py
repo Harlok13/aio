@@ -12,9 +12,8 @@ RANDOM_GIF = f'https://api.giphy.com/v1/gifs/random?api_key={os.getenv("GIPHY_AP
 
 
 async def start_cmd(message: types.Message):
-    await bot.send_message(message.chat.id,
-                           'Выберите действие',
-                           reply_markup=MENU_BOARD)
+    await message.answer(text='Выберите действие',
+                         reply_markup=MENU_BOARD)
 
 
 async def get_cat_cmd(message: types.Message):
@@ -23,9 +22,6 @@ async def get_cat_cmd(message: types.Message):
             res = await resp.json()
     await message.answer_photo(photo=res['file'],
                                reply_markup=GET_CAT)
-    # await bot.send_photo(message.chat.id,
-    #                      photo=res['file'],
-    #                      reply_markup=GET_CAT)
     await message.delete()
 
 
