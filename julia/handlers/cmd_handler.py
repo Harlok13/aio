@@ -43,12 +43,9 @@ async def get_gif_cmd(message: types.Message):
     await message.delete()
 
 
-# ['data']['images']['original_mp4']['mp4']
-
-
 async def info_cmd(message: types.Message):
-    await message.answer(text='Выберите книгу:',
-                         reply_markup=BOOK_CHOICE_MENU)
+    await message.answer(text='Выберите категорию:',
+                         reply_markup=CAT_CHOICE_MENU)
 
 
 
