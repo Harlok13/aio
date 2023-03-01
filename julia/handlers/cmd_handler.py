@@ -51,16 +51,10 @@ async def info_cmd(message: types.Message):
                          reply_markup=BOOK_CHOICE_MENU)
 
 
-# async def get_book_cmd(message: types.Message):
-#     file = InputFile('handlers/road_to.pdf')
-#     await bot.send_document(message.from_user.id,
-#                             document=file)
-#     await message.delete()
 
 
 def register_cmd_handler(dp: Dispatcher):
     dp.message.register(start_cmd, Command(commands=['start', 'help']))
-    # dp.message.register(get_book_cmd, Command(commands=['book']))
     dp.message.register(info_cmd, Command(commands=['info']))
     dp.message.register(get_cat_cmd, Command(commands=['cat']))
     dp.message.register(get_gif_cmd, Command(commands=['gif']))
