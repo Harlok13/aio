@@ -197,6 +197,13 @@ async def callback_say_ty(callback: types.CallbackQuery):
     """Сказать спасибо и удалить сообщение."""
     await callback.message.delete()
 
+
+async def close_menu(callback: types.CallbackQuery):
+    """Закрыть меню."""
+    await callback.message.answer(text='надеюсь я смог помочь', reply_markup=MENU_BOARD)
+    await callback.message.delete()
+
+
 async def callback_go_to_cat(callback: types.CallbackQuery):
     """
     Назад к категориям (из ссылки на книгу).
@@ -249,6 +256,7 @@ def register_callback_cmd(dp: Dispatcher):
     dp.callback_query.register(callback_django_info, F.data == 'django_cat')
     dp.callback_query.register(callback_pandas_info, F.data == 'pandas_cat')
     dp.callback_query.register(callback_ml_info, F.data == 'ml_cat')
+    dp.callback_query.register(close_menu, F.data == 'close')
 
     dp.callback_query.register(callback_recommendations_info, F.data == 'recommendations_cat')
 
