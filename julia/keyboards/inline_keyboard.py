@@ -5,13 +5,14 @@ TO_MENU_DATA = 'menu_cmd'
 
 CAT_CHOICE_MENU = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text='PYTHON', callback_data='python_cat')],
-        [InlineKeyboardButton(text='БАЗЫ ДАННЫХ', callback_data='db_cat')],
-        [InlineKeyboardButton(text='GIT', callback_data='git_cat')],
-        [InlineKeyboardButton(text='КНИГИ ДЛЯ СТАРТА', callback_data='start_cat')],
-        [InlineKeyboardButton(text='АЛГОРИТМЫ', callback_data='algorithms_cat')],
-        [InlineKeyboardButton(text='LINUX', callback_data='linux_cat')],
-        [InlineKeyboardButton(text='РЕКОМЕНДАЦИИ', callback_data='recommendations_cat')]
+        [InlineKeyboardButton(text='PYTHON', callback_data='python_cat'),
+        InlineKeyboardButton(text='БАЗЫ ДАННЫХ', callback_data='db_cat')],
+        [InlineKeyboardButton(text='GIT', callback_data='git_cat'),
+        InlineKeyboardButton(text='LINUX', callback_data='linux_cat')],
+        [InlineKeyboardButton(text='АЛГОРИТМЫ', callback_data='algorithms_cat'),
+        InlineKeyboardButton(text='КНИГИ ДЛЯ СТАРТА', callback_data='start_cat')],
+        [InlineKeyboardButton(text='РЕКОМЕНДАЦИИ', callback_data='recommendations_cat')],
+        [InlineKeyboardButton(text='ЗАКРЫТЬ МЕНЮ', callback_data='close')],
     ]
 )
 
