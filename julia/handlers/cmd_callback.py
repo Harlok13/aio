@@ -167,9 +167,8 @@ async def callback_get_kitty(callback: types.CallbackQuery):
             res: dict = await resp.json()
 
     await callback.message.delete()
-    await bot.send_photo(callback.message.chat.id,
-                         photo=res['file'],
-                         reply_markup=GET_CAT)
+    await callback.message.answer_photo(photo=res['file'],
+                                        reply_markup=GET_CAT)
 
 
 async def callback_get_book(callback: types.CallbackQuery):
