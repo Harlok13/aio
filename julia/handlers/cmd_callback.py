@@ -1,20 +1,15 @@
 import aiohttp
+import logging
 
-from aiogram import types, F
-from aiogram.filters import Command
+from aiogram import types, F, Router
+from aioredis import Redis
 
 from julia.keyboards.inline_keyboard import *
+from julia.keyboards.reply_keyboard import MENU_BOARD
 
-from julia.dispatcher import *
+redis = Redis()
+r = Router()
 
-# хардкод вариант
-BOOKS = {'sql': {'id_book': 91, 'remote_book': 'handlers/sql.pdf'},
-         'fauler': {'id_book': 93, 'remote_book': 'handlers/fauler.pdf'}}
-ERROR_FIND_BOOK = 'Ой, такой книги тут нет:('
-
-MY_CHAT_ID = -1001835718066
-MY_ID = 5485747686
-CHAT_ED = -1001889081173
 
 redis_prev = None
 
@@ -153,7 +148,7 @@ async def callback_ml_info(callback: types.CallbackQuery):
 
 async def callback_recommendations_info(callback: types.CallbackQuery):
     """Кнопка для выбора категории РЕКОМЕНДАЦИИ."""
-    await callback.message.edit_text(text='ой, это раздел пуст:( \n давайте добавим в него что-нибудь?',
+    await callback.message.edit_text(text='ой, этот раздел пуст:( \n давайте добавим в него что-нибудь?',
                                      reply_markup=RECOMMEND_MENU)
     # await callback.message.edit_text(text='Выберите книгу из рекомендаций',
     #                                  reply_markup=RECOMMEND_MENU)
@@ -210,66 +205,66 @@ async def callback_go_to_cat(callback: types.CallbackQuery):
     """
     print(callback.message.text)
     # if callback.data == '2':
-    if callback.message.text.split()[0] in ('2', ):
+    if callback.message.text.split()[0] in ('2',):
         await callback_nosql_info(callback)
     elif callback.message.text.split()[0] in ('11', '31', '9'):
         await callback_sql_info(callback)
-    elif callback.message.text.split()[0] in ('5', ):
+    elif callback.message.text.split()[0] in ('5',):
         await callback_git_info(callback)
     elif callback.message.text.split()[0] in ('6', '21', '22', '23'):
         await callback_start_book_info(callback)
-    elif callback.message.text.split()[0] in ('10', ):
+    elif callback.message.text.split()[0] in ('10',):
         await callback_algorithms_info(callback)
     elif callback.message.text.split()[0] in ('17', '20'):
         await callback_linux_info(callback)
     elif callback.message.text.split()[0] in ('3', '7', '16', '15', '18', '27',
                                               '28', '29', '36', '37'):
         await callback_python_books_info(callback)
-    elif callback.message.text.split()[0] in ('4', ):
+    elif callback.message.text.split()[0] in ('4',):
         await callback_kids_info(callback)
-    elif callback.message.text.split()[0] in ('1', ):
+    elif callback.message.text.split()[0] in ('1',):
         await callback_async_info(callback)
     elif callback.message.text.split()[0] in ('8', '12'):
         await callback_django_info(callback)
-    elif callback.message.text.split()[0] in ('13', ):
+    elif callback.message.text.split()[0] in ('13',):
         await callback_tests_info(callback)
-    elif callback.message.text.split()[0] in ('14', ):
+    elif callback.message.text.split()[0] in ('14',):
         await callback_pandas_info(callback)
     elif callback.message.text.split()[0] in ('32', '33', '30'):
         await callback_ml_info(callback)
 
 
-def register_callback_cmd(dp: Dispatcher):
-    dp.callback_query.register(callback_db_info, F.data == 'db_cat')
-    dp.callback_query.register(callback_nosql_info, F.data == 'nosql_cat')
-    dp.callback_query.register(callback_sql_info, F.data == 'sql_cat')
-    dp.callback_query.register(callback_git_info, F.data == 'git_cat')
-    dp.callback_query.register(callback_start_book_info, F.data == 'start_cat')
-    dp.callback_query.register(callback_algorithms_info, F.data == 'algorithms_cat')
-    dp.callback_query.register(callback_linux_info, F.data == 'linux_cat')
-    dp.callback_query.register(callback_python_cat_info, F.data == 'python_cat')
-    dp.callback_query.register(callback_python_books_info, F.data == 'pybook_cat')
-    dp.callback_query.register(callback_kids_info, F.data == 'kids_cat')
-    dp.callback_query.register(callback_async_info, F.data == 'async_cat')
-    dp.callback_query.register(callback_tests_info, F.data == 'tests_cat')
-    dp.callback_query.register(callback_django_info, F.data == 'django_cat')
-    dp.callback_query.register(callback_pandas_info, F.data == 'pandas_cat')
-    dp.callback_query.register(callback_ml_info, F.data == 'ml_cat')
-    dp.callback_query.register(close_menu, F.data == 'close')
+def register_callback_cmd(r: Router):
+    r.callback_query.register(callback_db_info, F.data == 'db_cat')
+    r.callback_query.register(callback_nosql_info, F.data == 'nosql_cat')
+    r.callback_query.register(callback_sql_info, F.data == 'sql_cat')
+    r.callback_query.register(callback_git_info, F.data == 'git_cat')
+    r.callback_query.register(callback_start_book_info, F.data == 'start_cat')
+    r.callback_query.register(callback_algorithms_info, F.data == 'algorithms_cat')
+    r.callback_query.register(callback_linux_info, F.data == 'linux_cat')
+    r.callback_query.register(callback_python_cat_info, F.data == 'python_cat')
+    r.callback_query.register(callback_python_books_info, F.data == 'pybook_cat')
+    r.callback_query.register(callback_kids_info, F.data == 'kids_cat')
+    r.callback_query.register(callback_async_info, F.data == 'async_cat')
+    r.callback_query.register(callback_tests_info, F.data == 'tests_cat')
+    r.callback_query.register(callback_django_info, F.data == 'django_cat')
+    r.callback_query.register(callback_pandas_info, F.data == 'pandas_cat')
+    r.callback_query.register(callback_ml_info, F.data == 'ml_cat')
+    r.callback_query.register(close_menu, F.data == 'close')
 
-    dp.callback_query.register(callback_recommendations_info, F.data == 'recommendations_cat')
+    r.callback_query.register(callback_recommendations_info, F.data == 'recommendations_cat')
 
-    dp.callback_query.register(callback_get_prev, F.data == GET_PREV_DATA)
-    dp.callback_query.register(callback_back_to_menu, F.data == TO_MENU_DATA)
+    r.callback_query.register(callback_get_prev, F.data == GET_PREV_DATA)
+    r.callback_query.register(callback_back_to_menu, F.data == TO_MENU_DATA)
 
-    dp.callback_query.register(callback_back_to_db, F.data == 'go_db')
-    dp.callback_query.register(callback_back_to_pyhon, F.data == 'go_python')
+    r.callback_query.register(callback_back_to_db, F.data == 'go_db')
+    r.callback_query.register(callback_back_to_pyhon, F.data == 'go_python')
 
-    dp.callback_query.register(callback_grandfa_reviews, F.data == 'grandfa_cmd')
-    dp.callback_query.register(callback_about_book, F.data == 'about_cmd')
-    dp.callback_query.register(callback_say_ty, F.data == 'ty')
-    dp.callback_query.register(callback_go_to_cat, F.data == 'go_to_cat')
+    r.callback_query.register(callback_grandfa_reviews, F.data == 'grandfa_cmd')
+    r.callback_query.register(callback_about_book, F.data == 'about_cmd')
+    r.callback_query.register(callback_say_ty, F.data == 'ty')
+    r.callback_query.register(callback_go_to_cat, F.data == 'go_to_cat')
 
-    dp.callback_query.register(callback_get_kitty, F.data == 'get_kitty')
+    r.callback_query.register(callback_get_kitty, F.data == 'get_kitty')
 
-    dp.callback_query.register(callback_get_book, book_filter)  # должен быть последним
+    r.callback_query.register(callback_get_book, book_filter)  # должен быть последним
