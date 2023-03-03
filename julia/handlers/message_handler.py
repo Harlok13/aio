@@ -2,10 +2,13 @@ import json
 import logging
 import random
 import string
+from aiogram import Router
 
-from julia.dispatcher import *
-from aiogram import types
+from aiogram import types, F
 
+from julia.keyboards.inline_keyboard import CAT_CHOICE_MENU
+
+r = Router()
 
 async def animation_info(message: types.Animation):
     logger = logging.getLogger(__name__)
@@ -24,6 +27,12 @@ async def photo_reply(message: types.Message):
                          'Ну что за милота',
                          'Красивенько 😍'])
     await message.reply(mes)
+
+
+async def get_library(message: types.Message):
+    await message.answer(text='Выберите категорию:',
+                         reply_markup=CAT_CHOICE_MENU)
+    await message.delete()
 
 
 async def echo(message: types.Message):
@@ -46,8 +55,9 @@ async def echo(message: types.Message):
                                                'я все вижу']))
     # await bot.send_message(message.chat.id, message.text)
 
-def register_message_handler(dp):
 
-def register_message_handler(dp: Dispatcher):
-    dp.register_message_handler(echo)
-    dp.register_message_handler(photo_reply, content_types=types.ContentTypes.PHOTO)
+def register_message_handler(r: Router):
+    r.message.register(photo_reply, F.photo)
+    r.message.register(get_library, F.text == 'БИБЛИОТЕКА')
+    # r.message.register(animation_info, F.animation)
+    # r.message.register(echo)
