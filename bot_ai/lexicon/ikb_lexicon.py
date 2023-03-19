@@ -9,13 +9,20 @@ MAIN_MENU: Dict[str, List[Union[Tuple[str, str], Tuple[int]]]] = {
         ('РЕЖИМ ПОИСКА', 'cat_search'),
         (2, 1, 2)
     ],
-    'profile': [
+    'cat_profile': [
         ('РЕФЕРАЛЬНАЯ СИСТЕМА', ''),
         ('НАЗАД', ''),
     ],
-    'referal': [
+    'cat_referral': [
         ('ПРИГЛАСИТЬ', ''),
         ('НАЗАД', ''),
     ],
-
+    'cat_search': [
+        ('ЗАДАТЬ ВОПРОС', 'set_question'),
+        ('СОЗДАТЬ КАРТИНКУ', 'set_picture'),
+        ('НАЗАД', ''),
+    ],
+    'cat_help': [
+        ('НАЗАД', ''),
+    ]
 }
