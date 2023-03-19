@@ -27,3 +27,10 @@ def get_search(current_search) -> str:
                       f'<b>{current_search}</b>\n\n'
 
     return search_msg
+
+
+MENU_LEXICON: Dict[str, Callable[[str], str]] = {
+    'cat_profile': get_profile,
+    'cat_referral': get_referral,
+    'cat_search': get_search,
+}
