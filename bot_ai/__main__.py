@@ -2,18 +2,17 @@ import asyncio
 import logging
 
 import openai
-
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import sessionmaker
 
 from bot_ai import config
 from bot_ai.data.engine import get_async_engine, get_session_maker
-from bot_ai.handlers import pay
+from bot_ai.handlers import pay, msg_handler
 from bot_ai.handlers.cb_handler import register_cb_handlers
 from bot_ai.handlers.cmd_handler import register_cmd_handlers
-from bot_ai.handlers.pay import order, pre_checkout_query, successful_payment
+from bot_ai.middlewares.mw_user_register import UserRegisterCheck
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +28,12 @@ async def main() -> None:
 
     dp: Dispatcher = Dispatcher()
 
+    # register middlewares
+    dp.message.middleware(UserRegisterCheck())
+    dp.callback_query.middleware(UserRegisterCheck())
+
     # register handlers
-    # dp.include_router(msg_handler.router)
+    dp.include_router(msg_handler.router)
     register_cmd_handlers(dp)
     register_cb_handlers(dp)
 
@@ -47,11 +50,15 @@ async def main() -> None:
         database=config.DATABASE,
         port=int(config.PG_PORT or 0)
     )
-    async_engine: AsyncEngine = get_async_engine(postgresql_url)
-    async_session_maker: sessionmaker = get_session_maker(async_engine)
+    engine: AsyncEngine = get_async_engine(postgresql_url)
+    session_maker: sessionmaker = get_session_maker(engine)
 
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    await dp.start_polling(
+        bot,
+        allowed_updates=dp.resolve_used_update_types(),
+        session_maker=session_maker
+    )
 
 
 if __name__ == "__main__":
