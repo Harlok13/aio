@@ -2,14 +2,16 @@ import datetime
 
 from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, VARCHAR, Boolean, DATE
 
+from bot_ai.data.base import BaseModel
 
-class User:
+
+class User(BaseModel):
     __tablename__ = 'users'
 
     user_id: Column = Column(BigInteger, primary_key=True)
     username: Column = Column(VARCHAR(64), nullable=True)
     nickname: Column = Column(VARCHAR(64), nullable=False)
-    status: Column = Column(Boolean, nullable=False, default='standard')
+    status: Column = Column(VARCHAR(64), nullable=False, default='standard')
     token_count: Column = Column(BigInteger, nullable=False, default=50000)
     days_left: Column = Column(Integer, nullable=False, default=0)
     question_count: Column = Column(Integer, nullable=False, default=0)
