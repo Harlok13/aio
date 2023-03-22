@@ -12,6 +12,7 @@ from bot_ai.data.engine import get_async_engine, get_session_maker
 from bot_ai.handlers import pay, msg_handler
 from bot_ai.handlers.cb_handler import register_cb_handlers
 from bot_ai.handlers.cmd_handler import register_cmd_handlers
+from bot_ai.middlewares.mw_payment import Payment
 from bot_ai.middlewares.mw_user_register import UserRegisterCheck
 
 logger = logging.getLogger(__name__)
@@ -31,9 +32,11 @@ async def main() -> None:
     # register middlewares
     dp.message.middleware(UserRegisterCheck())
     dp.callback_query.middleware(UserRegisterCheck())
+    dp.callback_query.middleware(Payment())
+    dp.message.middleware(Payment())
 
     # register handlers
-    dp.include_router(msg_handler.router)
+    # dp.include_router(msg_handler.router)
     register_cmd_handlers(dp)
     register_cb_handlers(dp)
 
