@@ -5,16 +5,17 @@ from sqlalchemy import text, update, select
 from sqlalchemy.orm import sessionmaker
 
 from bot_ai.data.schemas.user_model import User
+from bot_ai.lexicon.tokens_pay_lexicon import TOKENS
 
 ProfileInfo = namedtuple('ProfileInfo', ('nickname', 'question_count', 'token_count', 'days_left', 'status'))
 
 
 class UserRequest:
     def __init__(self, session: sessionmaker):
-        self.session: sessionmaker = session
+        self._session: sessionmaker = session
 
     @staticmethod
-    def set_days_left(
+    def _set_days_left(
             current_status: str,
             purchased_status: str,
             days_left: int,
@@ -35,7 +36,7 @@ class UserRequest:
         return days_sub
 
     @staticmethod
-    def set_tokens(
+    def _set_tokens(
             current_status: str,
             purchased_status: str,
             current_tokens: int,
@@ -98,21 +99,21 @@ class UserRequest:
         :return:
         """
         print('set_default_sub', purchased_status, user_id)
-        async with self.session.begin():
-            stmt_get: ChunckedIteratorResult = await self.session.execute(  # type: ignore
+        async with self._session.begin():
+            stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
                 select(User.token_count, User.days_left, User.status).where(User.user_id == user_id)
             )
             token_count, days_left, current_status = stmt_get.fetchall()[0]
 
             stmt_set = update(User).where(User.user_id == user_id).values(
                 status=purchased_status,
-                days_left=self.set_days_left(
+                days_left=self._set_days_left(
                     current_status,
                     purchased_status,
                     days_left,
                     days_sub
                 ),
-                token_count=self.set_tokens(
+                token_count=self._set_tokens(
                     current_status,
                     purchased_status,
                     token_count,
@@ -120,18 +121,17 @@ class UserRequest:
                 )
             )
 
-        await self.session.execute(stmt_set)  # type: ignore
-        await self.session.commit()  # type: ignore
+        await self._session.execute(stmt_set)  # type: ignore
+        await self._session.commit()  # type: ignore
 
     async def get_profile_info(self, user_id: int) -> ProfileInfo:
         """Get profile info from database"""
         print('get_profile_info', user_id)
-        stmt_get: ChunckedIteratorResult = await self.session.execute(  # type: ignore
+        stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
             select(
                 User.nickname, User.question_count, User.token_count, User.days_left, User.status
             ).where(User.user_id == user_id)
         )
-        # print(stmt_get.fetchall())
 
         profile: ProfileInfo = ProfileInfo(*stmt_get.fetchall()[0])
         return profile
@@ -142,8 +142,8 @@ class UserRequest:
         :param user_id: just a user id in telegram
         :return:
         """
-        async with self.session.begin():
-            stmt_get: ChunckedIteratorResult = await self.session.execute(  # type: ignore
+        async with self._session.begin():
+            stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
                 select(User.question_count).where(User.user_id == user_id)
             )
             question_count = stmt_get.fetchall()[0][0] + 1
