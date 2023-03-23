@@ -187,3 +187,33 @@ class UserRequest:
             token_count = stmt_get.fetchone()
         return token_count[0] > 0
 
+    async def set_tokens(self, user_id: int, purchased_tokens: int, ) -> None:
+        """
+        Set tokens for user in database
+        :param user_id: just a user id in telegram
+        :param purchased_tokens: quantity of purchased tokens
+        :return:
+        """
+        async with self._session.begin():
+            stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
+                select(User.token_count).where(User.user_id == user_id)
+            )
+            await self._session.execute(  # type: ignore
+                update(User).where(User.user_id == user_id).values(
+                    token_count=stmt_get.fetchone()[0] + purchased_tokens
+                )
+            )
+        await self._session.commit()  # type: ignore
+
+    async def get_user_status(self, user_id: int) -> str:
+        """
+        Get user status from database
+        :param user_id: just a user id in telegram
+        :return: current user status
+        """
+        async with self._session.begin():
+            stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
+                select(User.status).where(User.user_id == user_id)
+            )
+            current_status = stmt_get.fetchone()[0]
+        return current_status
