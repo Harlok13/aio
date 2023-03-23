@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, Union
 
 from aiogram import Bot, Router, F
 from aiogram.enums import ContentType
@@ -14,8 +15,20 @@ from bot_ai.utils.user_requsts import UserRequest
 router = Router()
 logger = logging.getLogger(__name__)
 
+# days for subscription
+DAYS_SUB: Dict[str, int] = {
+    'default_sub': 30,
+    'premium_sub': 30,
+    'unlimited_sub': 30
+}
 
-# @router.message(Command(commands='pay'))
+PURCHASED_TOKENS: Dict[str, Union[int, str]] = {
+    'default_sub': 1_500_000,
+    'premium_sub': 10_000_000,
+    'unlimited_sub': 999_999_999
+}
+
+
 @router.callback_query(F.data.endswith('sub'))
 async def order(callback: CallbackQuery, bot: Bot) -> None:
     pay_info: Pay = SUB_PAY_INFO.get(callback.data, False)
