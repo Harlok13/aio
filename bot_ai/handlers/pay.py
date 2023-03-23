@@ -31,21 +31,22 @@ PURCHASED_TOKENS: Dict[str, Union[int, str]] = {
 
 @router.callback_query(F.data.endswith('sub'))
 async def order(callback: CallbackQuery, bot: Bot) -> None:
-    pay_info: Pay = SUB_PAY_INFO.get(callback.data, False)
+    # subscription_order
+    subscription_info: SubPay = SUB_PAY_INFO.get(callback.data, False)
     print(callback.data)
-    print(pay_info)
-    pay_label: Label = SUB_PAY_LABELS.get(callback.data, False)
+    print(subscription_info)
+    subscription_label: SubLabel = SUB_PAY_LABELS.get(callback.data, False)
     await bot.send_invoice(
         chat_id=callback.message.chat.id,
-        title=pay_info.title,
-        description=pay_info.description,
-        payload=pay_info.payload,
+        title=subscription_info.title,
+        description=subscription_info.description,
+        payload=subscription_info.payload,
         provider_token=config.UKASSA_TOKEN,
         currency='rub',
         prices=[
             LabeledPrice(
-                label=pay_label.label,
-                amount=pay_label.amount
+                label=subscription_label.label,
+                amount=subscription_label.amount
             )
         ],
         max_tip_amount=1000,
