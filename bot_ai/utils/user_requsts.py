@@ -58,6 +58,30 @@ class UserRequest:
             return current_tokens
         return purchased_tokens
 
+    @staticmethod
+    def _spent_tokens_counter(current_tokens: int, openai_spent_tokens: int) -> int:
+        """
+        Multiplies the number of tokens spent on the answer from openai
+        :param current_tokens: current number of tokens of the user
+        :param openai_spent_tokens: number of tokens spent by openai
+        :return: number of tokens spent on the answer, it is total result
+        """
+        token_multiplier = 5
+        total_spent_tokens: int = current_tokens - openai_spent_tokens * token_multiplier
+        return total_spent_tokens
+
+    @staticmethod
+    def _check_user_tokens(user_id: int, current_user_tokens: int) -> bool:
+        """
+        Check if the user has enough tokens to purchase the subscription
+        :param user_id: user id
+        :param current_user_tokens: current number of tokens of the user
+        :return: True if the user has enough tokens to purchase the subscription
+        """
+        if current_user_tokens > 0:
+            return True
+        return False
+
     async def set_subscription(
             self,
             purchased_status: str,
