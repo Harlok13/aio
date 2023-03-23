@@ -1,13 +1,18 @@
 import logging
+from typing import Tuple, Callable
 
 import openai
 
 from aiogram import Router
 from aiogram.filters import Text
 from aiogram.types import Message
+from openai.openai_object import OpenAIObject
+
+from bot_ai.utils.bot_models import companion_bot_model
+from bot_ai.utils.user_requsts import UserRequest
 
 router = Router()
-
+logger = logging.getLogger(__name__)
 
 # @router.message(Text(contains="бот"))
 # async def ai_answer(message: Message) -> None:
@@ -26,14 +31,22 @@ router = Router()
 #     await message.answer(response.choices[0].text)
 
 
-@router.message(Text(contains="бот"))
-async def ai_answer(message: Message) -> None:
+@router.message()
+async def companion_bot_answer(message: Message, request: UserRequest, model: Callable) -> None:
     await message.reply('sec')
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": f"{message.text}"}],
-    )
-    logger = logging.getLogger(__name__)
-    logger.info(message.text)
-    logger.info(message.from_user.first_name)
-    await message.answer(response.choices[0].message.content)
+    check_user_tokes = await request.check_user_tokens(message.from_user.id)
+    if check_user_tokes:
+        response, msg = model(message)
+        await request.increase_question_count(user_id=message.from_user.id)
+
+        logger.info(message.text)
+        logger.info(message.from_user.first_name)
+        print(response)
+
+        total_openai_spent_tokens: int = response.usage.total_tokens
+        await request.decrease_user_tokens(
+            user_id=message.from_user.id, openai_spent_tokens=total_openai_spent_tokens
+        )
+        await message.answer(msg)
+    else:
+        await message.answer('У вас недостаточно токенов')
