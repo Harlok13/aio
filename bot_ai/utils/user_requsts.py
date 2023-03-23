@@ -118,9 +118,14 @@ class UserRequest:
         :param user_id: just a user id in telegram
         :return:
         """
-        print('set_default_sub', status, user_id)
         async with self.session.begin():
-            stmt = update(User).where(User.user_id == user_id).values(status=status)
-        await self.session.execute(stmt)  # type: ignore
+            stmt_get: ChunckedIteratorResult = await self.session.execute(  # type: ignore
+                select(User.question_count).where(User.user_id == user_id)
+            )
+            question_count = stmt_get.fetchall()[0][0] + 1
+            stmt_set = update(User).where(User.user_id == user_id).values(
+                question_count=question_count
+            )
+        await self.session.execute(stmt_set)  # type: ignore
         await self.session.commit()  # type: ignore
 
