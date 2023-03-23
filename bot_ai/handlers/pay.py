@@ -8,12 +8,12 @@ from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
 
 from bot_ai import config
 from bot_ai.lexicon.pay_lexicon import (
-    payment, SUB_PAY_INFO, Pay, SUB_PAY_LABELS, Label
+    payment, SUB_PAY_INFO, SUB_PAY_LABELS, SubPay, SubLabel
 )
 from bot_ai.utils.user_requsts import UserRequest
 
-router = Router()
-logger = logging.getLogger(__name__)
+router: Router = Router()
+logger: logging.Logger = logging.getLogger(__name__)
 
 # days for subscription
 DAYS_SUB: Dict[str, int] = {
@@ -74,11 +74,23 @@ async def order(callback: CallbackQuery, bot: Bot) -> None:
 
 
 @router.pre_checkout_query()
-async def pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot) -> None:
-    await bot.answer_pre_checkout_query(
-        pre_checkout_query_id=pre_checkout_query.id,
-        ok=True,
-    )
+async def pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot, request: UserRequest) -> None:
+    user_status: str = await request.get_user_status(pre_checkout_query.from_user.id)
+    print('status', user_status)
+    if user_status == 'premium_sub' and pre_checkout_query.invoice_payload == 'default_sub' \
+            or user_status == 'unlimited_sub' and (pre_checkout_query.invoice_payload == 'premium_sub'
+                                                   or pre_checkout_query.invoice_payload == 'default_sub'):
+        await bot.answer_pre_checkout_query(
+            pre_checkout_query.id,
+            ok=False,
+            error_message='Вы собираетесь купить подписку ниже уровнем'
+        )
+        return
+    else:
+        await bot.answer_pre_checkout_query(
+            pre_checkout_query_id=pre_checkout_query.id,
+            ok=True,
+        )
 
 
 @router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
