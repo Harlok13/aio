@@ -8,6 +8,7 @@ from sqlalchemy import select, ScalarResult, update
 from sqlalchemy.orm import sessionmaker
 
 from bot_ai.data.schemas.user_model import User
+from bot_ai.utils.bot_models import companion_bot_model
 
 
 class UserRegisterCheck(BaseMiddleware):
@@ -22,6 +23,7 @@ class UserRegisterCheck(BaseMiddleware):
     ) -> Any:
         logger = logging.getLogger(__name__)
         session_maker: sessionmaker = data['session_maker']
+        data['model'] = companion_bot_model
         async with session_maker() as session:
             async with session.begin():
                 result: ScalarResult = await session.execute(  # type: ignore
