@@ -1,7 +1,12 @@
-from sqlalchemy import text, update
+from collections import namedtuple
+from typing import Union
+
+from sqlalchemy import text, update, select
 from sqlalchemy.orm import sessionmaker
 
 from bot_ai.data.schemas.user_model import User
+
+ProfileInfo = namedtuple('ProfileInfo', ('nickname', 'question_count', 'token_count', 'days_left', 'status'))
 
 
 class UserRequest:
