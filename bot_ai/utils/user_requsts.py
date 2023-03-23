@@ -150,6 +150,40 @@ class UserRequest:
             stmt_set = update(User).where(User.user_id == user_id).values(
                 question_count=question_count
             )
-        await self.session.execute(stmt_set)  # type: ignore
-        await self.session.commit()  # type: ignore
+        await self._session.execute(stmt_set)  # type: ignore
+        await self._session.commit()  # type: ignore
+
+    async def decrease_user_tokens(self, user_id: int, openai_spent_tokens: int) -> None:
+        """
+        Decrease number of tokens for user in database. If number of tokens less than 0, then
+        number of tokens is set to 0
+        :param user_id: just a user id in telegram
+        :param openai_spent_tokens: number of tokens spent by openai
+        :return:
+        """
+        async with self._session.begin():
+            stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
+                select(User.token_count).where(User.user_id == user_id)
+            )
+            current_tokens: int = stmt_get.fetchall()[0][0] - 1
+            result_tokens: int = self._spent_tokens_counter(current_tokens, openai_spent_tokens)
+            if result_tokens < 0:
+                result_tokens = 0
+            stmt_set = update(User).where(User.user_id == user_id).values(token_count=result_tokens)
+
+        await self._session.execute(stmt_set)  # type: ignore
+        await self._session.commit()  # type: ignore
+
+    async def check_user_tokens(self, user_id: int) -> bool:
+        """
+        Check if the user can send a question to the bot
+        :param user_id: just a user id in telegram
+        :return: True if the user can send a question, otherwise False
+        """
+        async with self._session.begin():
+            stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
+                select(User.token_count).where(User.user_id == user_id)
+            )
+            token_count = stmt_get.fetchone()
+        return token_count[0] > 0
 
