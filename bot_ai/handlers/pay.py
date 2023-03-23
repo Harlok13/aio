@@ -84,7 +84,14 @@ async def pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot) -> 
 async def successful_payment(message: Message, request: UserRequest) -> None:
     logger.info(message.successful_payment)
     print('invoice', message.successful_payment.invoice_payload)
-    await request.set_default_sub(user_id=message.from_user.id, status=message.successful_payment.invoice_payload)
+    days_sub: int = DAYS_SUB.get(message.successful_payment.invoice_payload, False)
+    purchased_tokens: int = PURCHASED_TOKENS.get(message.successful_payment.invoice_payload, False)
+    await request.set_subscription(
+        user_id=message.from_user.id,
+        purchased_status=message.successful_payment.invoice_payload,
+        purchased_tokens=purchased_tokens,
+        days_sub=days_sub
+    )
     msg = payment.answer + \
           f'Вы оплатили {message.successful_payment.total_amount // 100} {message.successful_payment.currency}'
     await message.answer(msg)
