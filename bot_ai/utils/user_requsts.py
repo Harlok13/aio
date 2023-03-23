@@ -66,9 +66,56 @@ class UserRequest:
             purchased_tokens: Union[int, str],
     ) -> None:
         """
-        Set default subscription status in database
-        :param status: subscription type to be set
-        :param user_id: just a user id
+        Set paid subscription status for user in database
+        :param purchased_tokens: number of tokens purchased
+        :param days_sub: number of days of subscription
+        :param purchased_status: subscription type to be set
+        :param user_id: just a user id in telegram
+        :return:
+        """
+        print('set_default_sub', purchased_status, user_id)
+        async with self.session.begin():
+            stmt_get: ChunckedIteratorResult = await self.session.execute(  # type: ignore
+                select(User.token_count, User.days_left, User.status).where(User.user_id == user_id)
+            )
+            token_count, days_left, current_status = stmt_get.fetchall()[0]
+
+            stmt_set = update(User).where(User.user_id == user_id).values(
+                status=purchased_status,
+                days_left=self.set_days_left(
+                    current_status,
+                    purchased_status,
+                    days_left,
+                    days_sub
+                ),
+                token_count=self.set_tokens(
+                    current_status,
+                    purchased_status,
+                    token_count,
+                    purchased_tokens
+                )
+            )
+
+        await self.session.execute(stmt_set)  # type: ignore
+        await self.session.commit()  # type: ignore
+
+    async def get_profile_info(self, user_id: int) -> ProfileInfo:
+        """Get profile info from database"""
+        print('get_profile_info', user_id)
+        stmt_get: ChunckedIteratorResult = await self.session.execute(  # type: ignore
+            select(
+                User.nickname, User.question_count, User.token_count, User.days_left, User.status
+            ).where(User.user_id == user_id)
+        )
+        # print(stmt_get.fetchall())
+
+        profile: ProfileInfo = ProfileInfo(*stmt_get.fetchall()[0])
+        return profile
+
+    async def increase_question_count(self, user_id: int) -> None:
+        """
+        Increase question count for user in database
+        :param user_id: just a user id in telegram
         :return:
         """
         print('set_default_sub', status, user_id)
