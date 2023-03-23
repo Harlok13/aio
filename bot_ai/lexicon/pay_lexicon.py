@@ -1,49 +1,52 @@
 from collections import namedtuple
+from typing import Dict, Type
 
-Pay = namedtuple('Pay', 'title description payload')
+SubPay: Type['SubPay'] = namedtuple('SubPay', 'title description payload')
 
-Label = namedtuple('Label', 'label amount')
+SubLabel: Type['SubLabel'] = namedtuple('SubLabel', 'label amount')
 
 SuccessfulPayment = namedtuple('SuccessfulPayment', 'answer')
 
-SUB_PAY = {
+SUB_PAY: Dict[str, Dict[str, str]] = {
     'default_sub': {
         'title': 'Обычная подписка',
-        'description': 'Обычная подписка включает в себя 1,500,000 токенов каждую неделю',
+        'description': 'Данная подписка включает в себя 1,500,000 токенов каждую неделю',
         'payload': 'default_sub',
     },
     'premium_sub': {
         'title': 'Премиум подписка',
-        'description': 'Премиум подписка включает в себя 10,000,000 токенов каждую неделю',
+        'description': 'Данная подписка включает в себя 10,000,000 токенов каждую неделю',
         'payload': 'premium_sub',
     },
     'unlimited_sub': {
         'title': 'Безлимитная подписка',
-        'description': 'Безлимитная подписка включает в себя бесконечное количество токенов',
+        'description': 'Данная подписка включает в себя бесконечное количество токенов',
         'payload': 'unlimited_sub',
     }
 }
 
 # sub_info
-SUB_PAY_INFO = {
-    'pay_default_sub': Pay(**SUB_PAY['default_sub']),
-    'pay_premium_sub': Pay(**SUB_PAY['premium_sub']),
-    'pay_unlimited_sub': Pay(**SUB_PAY['unlimited_sub'])
+SUB_PAY_INFO: Dict[str, SubPay] = {
+    'pay_default_sub': SubPay(**SUB_PAY['default_sub']),
+    'pay_premium_sub': SubPay(**SUB_PAY['premium_sub']),
+    'pay_unlimited_sub': SubPay(**SUB_PAY['unlimited_sub'])
 
 }
 # sub_labels
-SUB_PAY_LABELS = {
-    'pay_default_sub': Label(
+SUB_PAY_LABELS: Dict[str, SubLabel] = {
+    'pay_default_sub': SubLabel(
         label='Обычная подписка',
         amount=25_000
     ),
-    'pay_premium_sub': Label(
+    'pay_premium_sub': SubLabel(
         label='Премиум подписка',
-        amount=112_500
+        # amount=112_500
+        amount=50_000
     ),
-    'pay_unlimited_sub': Label(
+    'pay_unlimited_sub': SubLabel(
         label='Безлимитная подписка',
-        amount=225_000
+        # amount=225_000
+        amount=75_000
     )
 }
 
