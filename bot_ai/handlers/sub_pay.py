@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, Union
 
 from aiogram import Bot, Router, F
 from aiogram.enums import ContentType
@@ -84,13 +83,19 @@ async def sub_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot, req
         )
 
 
-@router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
+@router.message(
+    F.content_type == ContentType.SUCCESSFUL_PAYMENT,
+    F.invoice_payload.endswith('sub')
+)
 async def successful_payment(message: Message, request: UserRequest) -> None:
     logger.info(message.successful_payment)
+    print('payment', message.successful_payment)
     print('invoice', message.successful_payment.invoice_payload)
+    data_sub: str = message.successful_payment.invoice_payload
+    sub_amount: int = message.successful_payment.total_amount
 
-    days_sub: int = DAYS_SUB.get(message.successful_payment.invoice_payload, False)
-    purchased_tokens: int = PURCHASED_TOKENS.get(message.successful_payment.invoice_payload, False)
+    days_sub: int = subscription.get_days(data_sub, sub_amount)
+    purchased_tokens: int = subscription.get_tokens(data_sub)
     try:
         await request.set_subscription(
             user_id=message.from_user.id,
@@ -98,13 +103,11 @@ async def successful_payment(message: Message, request: UserRequest) -> None:
             purchased_tokens=purchased_tokens,
             days_sub=days_sub
         )
-        msg = f'Вы оплатили {message.successful_payment.total_amount // 100} {message.successful_payment.currency}' \
-              + payment.answer
+        success_msg: str = subscription.get_successful_payment_msg(message)
+        await message.answer(success_msg)
 
-        await message.answer(msg)
     except Exception as exc:
         logger.error(exc)
         await message.answer(
-            'Что-то пошло не так. Сообщите, пожалуйста, об ошибке администратору.'
-            'Контакты можно найти, вызвав команду /help'
+            subscription.something_wrong_message
         )
