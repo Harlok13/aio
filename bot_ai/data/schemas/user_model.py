@@ -9,7 +9,7 @@ class User(BaseModel):
     __tablename__ = 'users'
 
     user_id: Column = Column(BigInteger, primary_key=True)
-    username: Column = Column(VARCHAR(64), nullable=True)
+    username: Column = Column(VARCHAR(64), nullable=True, unique=True)
     nickname: Column = Column(VARCHAR(64), nullable=False)
     status: Column = Column(VARCHAR(64), nullable=False, default='standard')
     token_count: Column = Column(BigInteger, nullable=False, default=50000)
