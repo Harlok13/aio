@@ -5,7 +5,7 @@ from sqlalchemy import text, update, select
 from sqlalchemy.orm import sessionmaker
 
 from bot_ai.data.schemas.user_model import User
-from bot_ai.lexicon.tokens_pay_lexicon import TOKENS
+# from bot_ai.lexicon.tokens_pay_lexicon import TOKENS
 
 ProfileInfo = namedtuple('ProfileInfo', ('nickname', 'question_count', 'token_count', 'days_left', 'status'))
 
@@ -51,11 +51,9 @@ class UserRequest:
         :param purchased_status: purchased status of the user subscription
         :param current_tokens: current number of tokens of the user
         :param purchased_tokens: purchased number of tokens of the user
-        :return: number of tokens or the string 'unlimited' if the status is unlimited
+        :return: number of tokens
         """
-        if purchased_status == 'unlimited':
-            return 'unlimited'
-        elif current_status == purchased_status and current_status:
+        if current_status == purchased_status:
             return current_tokens
         return purchased_tokens
 
@@ -146,7 +144,7 @@ class UserRequest:
             stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
                 select(User.question_count).where(User.user_id == user_id)
             )
-            question_count = stmt_get.fetchall()[0][0] + 1
+            question_count: int = stmt_get.fetchone()[0] + 1
             stmt_set = update(User).where(User.user_id == user_id).values(
                 question_count=question_count
             )
@@ -184,8 +182,8 @@ class UserRequest:
             stmt_get: ChunckedIteratorResult = await self._session.execute(  # type: ignore
                 select(User.token_count).where(User.user_id == user_id)
             )
-            token_count = stmt_get.fetchone()
-        return token_count[0] > 0
+            token_count: int = stmt_get.fetchone()[0]
+        return token_count > 0
 
     async def set_tokens(self, user_id: int, purchased_tokens: int, ) -> None:
         """
