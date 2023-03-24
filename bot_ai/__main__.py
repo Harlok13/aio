@@ -9,9 +9,10 @@ from sqlalchemy.orm import sessionmaker
 
 from bot_ai import config
 from bot_ai.data.engine import get_async_engine, get_session_maker
-from bot_ai.handlers import pay, msg_handler
+from bot_ai.handlers import sub_pay, msg_handler, tokens_pay
 from bot_ai.handlers.cb_handler import register_cb_handlers
 from bot_ai.handlers.cmd_handler import register_cmd_handlers
+from bot_ai.keyboards.set_menu import set_menu
 from bot_ai.middlewares.mw_payment import Payment
 from bot_ai.middlewares.mw_user_register import UserRegisterCheck
 
@@ -33,16 +34,21 @@ async def main() -> None:
     dp.message.middleware(UserRegisterCheck())
     dp.callback_query.middleware(UserRegisterCheck())
     dp.callback_query.middleware(Payment())
+    dp.pre_checkout_query.middleware(Payment())
     dp.message.middleware(Payment())
 
+    # register payment
+    dp.include_router(sub_pay.router)
+    dp.include_router(tokens_pay.router)
+
     # register handlers
-    # dp.include_router(msg_handler.router)
     register_cmd_handlers(dp)
     register_cb_handlers(dp)
+    dp.include_router(msg_handler.router)  # bot_ai/handlers/msg_handler.py
 
-    # register payment
-    dp.include_router(pay.router)
-    # dp.message.register(successful_payment, ContentTypesFilter(content_types=[ContentType.SUCCESSFUL_PAYMENT]))
+
+    # include menu
+    await set_menu(bot)
 
     # include postgresql
     postgresql_url: URL = URL.create(
