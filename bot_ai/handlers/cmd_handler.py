@@ -40,3 +40,4 @@ async def cmd_menu(message: Message) -> None:
 def register_cmd_handlers(router: Router) -> None:
     router.message.register(cmd_start, CommandStart())
     router.message.register(cmd_help, Command(commands='help'))
+    router.message.register(cmd_menu, Command(commands='menu'))
