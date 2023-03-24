@@ -29,6 +29,14 @@ async def cmd_help(message: Message) -> None:
     )
 
 
+async def cmd_menu(message: Message) -> None:
+    await message.delete()
+    await message.answer(
+        text=MENU_LEXICON['cat_menu'](),
+        reply_markup=main_menu('cat_menu'),
+    )
+
+
 def register_cmd_handlers(router: Router) -> None:
     router.message.register(cmd_start, CommandStart())
     router.message.register(cmd_help, Command(commands='help'))
