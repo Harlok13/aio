@@ -63,17 +63,18 @@ async def subscription_order(callback: CallbackQuery, bot: Bot) -> None:
     )
 
 
-@router.pre_checkout_query()
-async def pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot, request: UserRequest) -> None:
+# ref
+@router.pre_checkout_query(F.invoice_payload.startswith('pay'))  # add filter
+async def sub_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot, request: UserRequest) -> None:
     user_status: str = await request.get_user_status(pre_checkout_query.from_user.id)
     print('status', user_status)
     if user_status == 'premium_sub' and pre_checkout_query.invoice_payload == 'default_sub' \
             or user_status == 'unlimited_sub' and (pre_checkout_query.invoice_payload == 'premium_sub'
                                                    or pre_checkout_query.invoice_payload == 'default_sub'):
         await bot.answer_pre_checkout_query(
-            pre_checkout_query.id,
+            pre_checkout_query_id=pre_checkout_query.id,
             ok=False,
-            error_message='Вы собираетесь купить подписку ниже уровнем'
+            error_message=subscription.error_message
         )
         return
     else:
