@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Callable, Awaitable
+from typing import Dict, Callable, Awaitable, Optional
 
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
@@ -12,13 +12,15 @@ from bot_ai.utils.user_requsts import UserRequest
 logger = logging.getLogger(__name__)
 
 
-
-async def main_menu_cb(callback: CallbackQuery, request: UserRequest) -> None:
+async def main_menu_cb(callback: CallbackQuery, request: UserRequest) -> Optional[bool]:
     print(callback.data)
     logger.info(callback.data)
     action_menu: Dict[str, Callable] = {
-        'cat_profile': request.get_profile_info
+        'cat_profile': request.get_profile_info,
     }
+    if callback.data == 'cat_exit':
+        return await callback.message.delete()
+
     if callback.data in action_menu:
         info = await action_menu.get(callback.data)(callback.message.chat.id)
     else:
