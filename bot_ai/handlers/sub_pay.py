@@ -7,35 +7,25 @@ from aiogram.filters import Text, Command
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
 
 from bot_ai import config
-from bot_ai.lexicon.pay_lexicon import (
-    payment, SUB_PAY_INFO, SUB_PAY_LABELS, SubPay, SubLabel
+from bot_ai.keyboards.inline_keyboard import main_menu
+from bot_ai.lexicon.sub_pay_lexicon import (
+    SubPay, SubLabel, SubPayInfo
 )
 from bot_ai.utils.user_requsts import UserRequest
 
 router: Router = Router()
 logger: logging.Logger = logging.getLogger(__name__)
 
-# days for subscription
-DAYS_SUB: Dict[str, int] = {
-    'default_sub': 30,
-    'premium_sub': 30,
-    'unlimited_sub': 30
-}
-
-PURCHASED_TOKENS: Dict[str, Union[int, str]] = {
-    'default_sub': 1_500_000,
-    'premium_sub': 10_000_000,
-    'unlimited_sub': 999_999_999
-}
+subscription: SubPayInfo = SubPayInfo()
 
 
-@router.callback_query(F.data.endswith('sub'))
-async def order(callback: CallbackQuery, bot: Bot) -> None:
-    # subscription_order
-    subscription_info: SubPay = SUB_PAY_INFO.get(callback.data, False)
+@router.callback_query(F.data.startswith('pay'))
+async def subscription_order(callback: CallbackQuery, bot: Bot) -> None:
+    data_sub, months = callback.data[:-2], callback.data[-1]
+    subscription_info: SubPay = subscription.get_info(data_sub)
     print(callback.data)
     print(subscription_info)
-    subscription_label: SubLabel = SUB_PAY_LABELS.get(callback.data, False)
+    subscription_label: SubLabel = subscription.get_labels(data_sub, months)
     await bot.send_invoice(
         chat_id=callback.message.chat.id,
         title=subscription_info.title,
