@@ -3,6 +3,9 @@ import logging
 
 import openai
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
+from aioredis import Redis
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import sessionmaker
@@ -28,7 +31,16 @@ async def main() -> None:
     bot: Bot = Bot(token=config.BOT_TOKEN, parse_mode='HTML')
     openai.api_key = config.AI_TOKEN
 
-    dp: Dispatcher = Dispatcher()
+    # create storage
+    storage: str = config.FSM_STORAGE
+    match storage:
+        case 'memory':
+            storage: MemoryStorage = MemoryStorage()
+        case 'redis':
+            redis: Redis = Redis()
+            storage: RedisStorage = RedisStorage(redis)
+
+    dp: Dispatcher = Dispatcher(storage=storage)
 
     # register middlewares
     dp.message.middleware(UserRegisterCheck())
@@ -45,7 +57,6 @@ async def main() -> None:
     register_cmd_handlers(dp)
     register_cb_handlers(dp)
     dp.include_router(msg_handler.router)  # bot_ai/handlers/msg_handler.py
-
 
     # include menu
     await set_menu(bot)
