@@ -9,6 +9,7 @@ from bot_ai.handlers.cb_handler import standard_settings
 
 StandardSettings: Type['StandardSettings'] = namedtuple('StandardSettings', ['model', 'temperature', 'max_tokens'])
 
+
 # standard_settings: StandardSettings = StandardSettings(
 #     model='text-davinci-003',
 #     temperature=1,
@@ -24,8 +25,6 @@ StandardSettings: Type['StandardSettings'] = namedtuple('StandardSettings', ['mo
 #         max_tokens=standard_settings.max_tokens,
 #     )
 #     return response
-
-
 
 
 def standard_bot_model(message: Message) -> Tuple[OpenAIObject, str]:
@@ -58,3 +57,12 @@ def companion_bot_model(message: Message) -> Tuple[OpenAIObject, str]:
 
 def translator_bot_model():
     ...
+
+
+OPENAI_MODELS = {
+    'set_artist': artist_bot_model,
+    'set_coder': coder_bot_model,
+    'set_translator': translator_bot_model,
+    'set_companion': companion_bot_model,
+    'set_standard': standard_bot_model
+}
