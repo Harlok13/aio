@@ -6,11 +6,13 @@ from aiogram.types import Message
 
 from bot_ai.keyboards.inline_keyboard import main_menu
 from bot_ai.lexicon.menu_lexicon import MENU_LEXICON
+from bot_ai.states.states import FSMOpenaiModel
 
 logger = logging.getLogger(__name__)
 
 
-async def cmd_start(message: Message) -> None:
+async def cmd_start(message: Message, state: FSMContext) -> None:
+    await state.set_state(FSMOpenaiModel.set_standard)
     await message.answer(
         '<b>📌 Используя бота вы соглашаетесь с нашими правилами (Нажмите кнопку ниже, чтобы прочитать)</b>\n',
     )
