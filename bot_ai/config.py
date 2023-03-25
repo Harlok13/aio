@@ -22,3 +22,6 @@ PG_PASSWORD_TEST = os.getenv("PG_PASSWORD_TEST")
 DATABASE_TEST = os.getenv("DATABASE_TEST")
 IP_TEST = os.getenv("IP_TEST")
 PG_PORT_TEST = os.getenv("PG_PORT_TEST")
+
+# storage
+FSM_STORAGE = os.getenv("FSM_STORAGE")
