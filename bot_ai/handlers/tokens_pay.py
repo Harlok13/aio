@@ -56,21 +56,23 @@ async def tokens_order(callback: CallbackQuery, bot: Bot) -> None:
         request_timeout=15
     )
 
-@router.pre_checkout_query()
-async def tokens_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot) -> None:
-    # if request.check_user_status == 'unlimited_sub':
-    #     await bot.answer_pre_checkout_query(
-    #         pre_checkout_query.id,
-    #         ok=False,
-    #         error_message='У вас безлимитная подписка, вам не нужно покупать токены'
-    #     )
-    #     return
-    # else:
-    await bot.answer_pre_checkout_query(
-        pre_checkout_query_id=pre_checkout_query.id,
-        ok=True,
-        error_message=None
-    )
+
+@router.pre_checkout_query(F.invoice_payload.startswith('tokens'))
+async def tokens_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot, request: UserRequest) -> None:
+    print('tokens_checkout', pre_checkout_query)
+    if (query := await request.get_user_status(pre_checkout_query.from_user.id)) == 'unlimited_sub':
+        await bot.answer_pre_checkout_query(
+            pre_checkout_query_id=pre_checkout_query.id,
+            ok=False,
+            error_message=token.error_message
+        )
+        return
+    else:
+        await bot.answer_pre_checkout_query(
+            pre_checkout_query_id=pre_checkout_query.id,
+            ok=True,
+            error_message=None
+        )
 
 
 @router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
