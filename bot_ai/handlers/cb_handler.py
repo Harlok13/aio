@@ -34,14 +34,22 @@ async def _get_cat_models(callback: CallbackQuery, current_state: str):
 
 
 
-async def main_menu_cb(callback: CallbackQuery, request: UserRequest) -> Optional[bool]:
-    print(callback.data)
+
+# ref
+async def get_main_menu_cb(callback: CallbackQuery, request: UserRequest, state: FSMContext) -> Optional[bool]:
     logger.info(callback.data)
+
     action_menu: Dict[str, Callable] = {
         'cat_profile': request.get_profile_info,
     }
-    if callback.data == 'cat_exit':
-        return await callback.message.delete()
+    current_state: str = await state.get_state()
+
+    if await _get_cat_models(callback, current_state):
+        return
+
+    await _get_cat_help(callback)
+
+    await _get_exit(callback)
 
     if callback.data in action_menu:
         info = await action_menu.get(callback.data)(callback.message.chat.id)
