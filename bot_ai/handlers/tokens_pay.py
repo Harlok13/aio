@@ -5,17 +5,19 @@ from aiogram.enums import ContentType
 from aiogram.types import CallbackQuery, LabeledPrice, PreCheckoutQuery, Message
 
 from bot_ai import config
-from bot_ai.lexicon.tokens_pay_lexicon import TokenPay, TOKEN_PAY_INFO, TokenLabel, TOKEN_PAY_LABELS, TOKENS
+from bot_ai.lexicon.tokens_pay_lexicon import TokenPay, TokenLabel, TokenPayInfo
 from bot_ai.utils.user_requsts import UserRequest
 
 router: Router = Router()
 logger: logging.Logger = logging.getLogger(__name__)
 
+token: TokenPayInfo = TokenPayInfo()
+
 
 @router.callback_query(F.data.startswith('tokens'))
 async def tokens_order(callback: CallbackQuery, bot: Bot) -> None:
-    token_info: TokenPay = TOKEN_PAY_INFO.get(callback.data, False)
-    token_label: TokenLabel = TOKEN_PAY_LABELS.get(callback.data, False)
+    token_info: TokenPay = token.TOKEN_PAY_INFO.get(callback.data, False)
+    token_label: TokenLabel = token.TOKEN_PAY_LABELS.get(callback.data, False)
     print(token_label)
     print(token_info)
     await bot.send_invoice(
