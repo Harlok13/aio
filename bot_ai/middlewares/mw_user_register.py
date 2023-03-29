@@ -23,7 +23,7 @@ class UserRegisterCheck(BaseMiddleware):
     ) -> Any:
         logger = logging.getLogger(__name__)
         session_maker: sessionmaker = data['session_maker']
-        data['model'] = companion_bot_model
+        data['openai_model'] = companion_bot_model
         async with session_maker() as session:
             async with session.begin():
                 result: ScalarResult = await session.execute(  # type: ignore
