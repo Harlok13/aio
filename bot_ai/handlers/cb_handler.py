@@ -20,7 +20,18 @@ logger: logging.Logger = logging.getLogger(__name__)
 _set_model_deque: deque = deque()
 
 
-logger = logging.getLogger(__name__)
+async def _get_exit(callback: CallbackQuery):
+    if callback.data == 'cat_exit':
+        return await callback.message.delete()
+
+
+async def _get_cat_models(callback: CallbackQuery, current_state: str):
+    if current_state and callback.data == 'cat_models':
+        return await callback.message.edit_text(
+            text=get_models_info(get_current_state_info(current_state)),
+            reply_markup=main_menu(callback.data),
+        )
+
 
 
 async def main_menu_cb(callback: CallbackQuery, request: UserRequest) -> Optional[bool]:
