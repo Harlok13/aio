@@ -75,22 +75,24 @@ async def tokens_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot, 
         )
 
 
-@router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
+@router.message(
+    F.content_type == ContentType.SUCCESSFUL_PAYMENT,
+    F.successful_payment.invoice_payload.startswith('tokens')
+)
 async def successful_payment(message: Message, request: UserRequest) -> None:
     logger.info(f'Successful payment from {message.chat.id}')
-    print('invoice', message.successful_payment.invoice_payload)
 
-    purchased_tokens: int = TOKENS.get(message.successful_payment.invoice_payload, False)
+    purchased_tokens: int = token.TOKENS.get(message.successful_payment.invoice_payload, False)
     try:
         await request.set_tokens(
             user_id=message.from_user.id,
             purchased_tokens=purchased_tokens
         )
-        msg = f'Вы оплатили {message.successful_payment.total_amount // 100} {message.successful_payment.currency}'
-        await message.answer(msg)
+        success_msg = token.get_successful_payment_message(message)
+        await message.answer(success_msg)
+
     except Exception as exc:
         logger.error(exc)
         await message.answer(
-            'Что-то пошло не так. Сообщите, пожалуйста, об ошибке администратору.'
-            'Контакты можно найти, вызвав команду /help'
+            token.something_wrong_message
         )
