@@ -2,6 +2,7 @@ from collections import namedtuple
 from typing import Type
 
 COMMANDS = {
+    'start': 'На время тестирования',
     'menu': 'Меню',
     'help': 'Помощь',
     'set': 'Установить модель',
