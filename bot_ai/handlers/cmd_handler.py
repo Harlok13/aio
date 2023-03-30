@@ -2,6 +2,7 @@ import logging
 
 from aiogram import Router
 from aiogram.filters import CommandStart, Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from bot_ai.keyboards.inline_keyboard import main_menu
